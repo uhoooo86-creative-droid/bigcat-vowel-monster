@@ -1,1295 +1,723 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BIG CAT Teaching Style Quiz</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BeatCat MBTI Slot</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --yellow: #FFD600;
-    --orange: #FF6B35;
-    --pink: #FF3D7F;
-    --blue: #00B4D8;
-    --green: #06D6A0;
-    --purple: #7B2FBE;
-    --dark: #1A1A2E;
-    --white: #FFFDF5;
-    --bg-red: #CC0000;
-    --card-bg: #FFFFFF;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    background: #CC0000 !important;
-  }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: #CC0000;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-
-  /* Animated background dots */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle, rgba(255,214,0,0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .app {
-    position: relative;
-    z-index: 1;
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
-  }
-
-  /* ===== SCREENS ===== */
-  .screen { display: none; }
-  .screen.active { display: block; }
-
-  /* ===== WELCOME SCREEN ===== */
-  .welcome-screen {
-    text-align: center;
-    padding: 30px 20px 60px;
-  }
-
-  .cat-logo {
-    font-size: 80px;
-    margin-bottom: 8px;
-    display: block;
-    animation: bounce 2s infinite;
-    filter: drop-shadow(0 8px 16px rgba(255,214,0,0.4));
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-
-  .brand-tag {
-    display: inline-block;
-    background: var(--yellow);
-    color: var(--dark);
-    font-family: 'Fredoka One', cursive;
-    font-size: 13px;
-    letter-spacing: 3px;
-    padding: 4px 14px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
-
-  .welcome-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(36px, 8vw, 56px);
-    color: var(--white);
-    line-height: 1.1;
-    margin-bottom: 8px;
-  }
-
-  .welcome-title span {
-    color: var(--yellow);
-    display: block;
-  }
-
-  .welcome-subtitle {
-    font-size: 15px;
-    color: rgba(255,253,245,0.65);
-    margin-bottom: 32px;
-    line-height: 1.6;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .type-cards-preview {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-bottom: 36px;
-  }
-
-  .type-preview-card {
-    background: rgba(255,255,255,0.07);
-    border: 2px solid rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: 12px 14px;
-    text-align: center;
-    width: 100px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .type-preview-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--yellow);
-  }
-
-  .type-preview-card .type-emoji { font-size: 28px; display: block; margin-bottom: 4px; }
-  .type-preview-card .type-code { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--yellow); }
-  .type-preview-card .type-name { font-size: 10px; color: rgba(255,253,245,0.5); font-weight: 700; letter-spacing: 0.5px; }
-
-  .start-btn {
-    display: inline-block;
-    background: var(--yellow);
-    color: var(--dark);
-    font-family: 'Fredoka One', cursive;
-    font-size: 22px;
-    padding: 18px 52px;
-    border-radius: 50px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 8px 0 #b39900, 0 12px 30px rgba(255,214,0,0.3);
-    transition: all 0.15s;
-    letter-spacing: 1px;
-  }
-
-  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 11px 0 #b39900, 0 16px 40px rgba(255,214,0,0.4); }
-  .start-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #b39900, 0 6px 20px rgba(255,214,0,0.2); }
-
-  .quiz-count-badge {
-    margin-top: 16px;
-    font-size: 13px;
-    color: rgba(255,253,245,0.4);
-    font-weight: 700;
-  }
-
-  /* ===== QUIZ SCREEN ===== */
-  .quiz-screen { padding: 20px 0 60px; }
-
-  .quiz-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-  }
-
-  .q-counter {
-    font-family: 'Fredoka One', cursive;
-    font-size: 14px;
-    color: rgba(255,253,245,0.5);
-    letter-spacing: 1px;
-  }
-
-  .q-counter strong {
-    color: var(--yellow);
-    font-size: 22px;
-  }
-
-  .progress-ring-wrap {
-    position: relative;
-    width: 56px;
-    height: 56px;
-  }
-
-  .progress-ring {
-    transform: rotate(-90deg);
-  }
-
-  .progress-ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
-  .progress-ring-fill {
-    fill: none;
-    stroke: var(--yellow);
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-dasharray: 138;
-    stroke-dashoffset: 138;
-    transition: stroke-dashoffset 0.5s ease;
-  }
-
-  .progress-pct {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Fredoka One', cursive;
-    font-size: 13px;
-    color: var(--yellow);
-  }
-
-  .section-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.07);
-    border: 1.5px solid rgba(255,255,255,0.12);
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 11px;
-    font-weight: 800;
-    color: rgba(255,253,245,0.6);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  .question-card {
-    background: var(--white);
-    border-radius: 24px;
-    padding: 28px 24px 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.3), 0 4px 0 var(--yellow);
-    animation: slideIn 0.3s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(30px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .question-text {
-    font-size: clamp(15px, 3.5vw, 18px);
-    font-weight: 800;
-    color: var(--dark);
-    line-height: 1.5;
-    margin-bottom: 4px;
-  }
-
-  .question-emoji {
-    font-size: 36px;
-    margin-bottom: 12px;
-    display: block;
-  }
-
-  .options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .option-btn {
-    width: 100%;
-    text-align: left;
-    background: #F5F3EA;
-    border: 2.5px solid #E8E4D8;
-    border-radius: 16px;
-    padding: 14px 18px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--dark);
-    cursor: pointer;
-    transition: all 0.18s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    line-height: 1.4;
-  }
-
-  .option-btn:hover {
-    background: var(--dark);
-    color: var(--white);
-    border-color: var(--dark);
-    transform: translateX(4px);
-  }
-
-  .option-btn.selected {
-    background: var(--yellow);
-    border-color: #b39900;
-    color: var(--dark);
-    transform: translateX(4px);
-  }
-
-  .option-label {
-    background: var(--dark);
-    color: var(--yellow);
-    font-family: 'Fredoka One', cursive;
-    font-size: 13px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.18s;
-  }
-
-  .option-btn.selected .option-label {
-    background: var(--dark);
-    color: var(--yellow);
-  }
-
-  .nav-btns {
-    display: flex;
-    gap: 12px;
-  }
-
-  .nav-btn {
-    flex: 1;
-    padding: 16px;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    font-family: 'Fredoka One', cursive;
-    font-size: 18px;
-    transition: all 0.15s;
-  }
-
-  .nav-btn.prev {
-    background: rgba(255,255,255,0.08);
-    color: rgba(255,253,245,0.6);
-    border: 2px solid rgba(255,255,255,0.12);
-  }
-
-  .nav-btn.prev:hover { background: rgba(255,255,255,0.15); color: var(--white); }
-
-  .nav-btn.next {
-    background: var(--yellow);
-    color: var(--dark);
-    box-shadow: 0 6px 0 #b39900;
-  }
-
-  .nav-btn.next:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b39900; }
-  .nav-btn.next:active { transform: translateY(3px); box-shadow: 0 3px 0 #b39900; }
-  .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none !important; }
-
-  /* ===== LOADING SCREEN ===== */
-  .loading-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-    text-align: center;
-    gap: 20px;
-  }
-
-  .loading-cat {
-    font-size: 64px;
-    animation: spin-bounce 1s infinite;
-  }
-
-  @keyframes spin-bounce {
-    0%, 100% { transform: rotate(-10deg) scale(1); }
-    50% { transform: rotate(10deg) scale(1.1); }
-  }
-
-  .loading-bar-wrap {
-    width: 200px;
-    height: 10px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .loading-bar-fill {
-    height: 100%;
-    background: var(--yellow);
-    border-radius: 10px;
-    animation: loadfill 1.8s ease-in-out forwards;
-  }
-
-  @keyframes loadfill {
-    from { width: 0; }
-    to { width: 100%; }
-  }
-
-  .loading-text {
-    font-family: 'Fredoka One', cursive;
-    font-size: 20px;
-    color: var(--white);
-    opacity: 0.8;
-  }
-
-  /* ===== RESULT SCREEN ===== */
-  .result-screen { padding: 20px 0 80px; animation: fadeIn 0.5s ease; }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; } }
-
-  .result-header {
-    text-align: center;
-    margin-bottom: 28px;
-  }
-
-  .result-cat-icon {
-    font-size: 80px;
-    display: block;
-    margin-bottom: 12px;
-    filter: drop-shadow(0 8px 20px rgba(255,214,0,0.5));
-    animation: float 3s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .result-type-badge {
-    display: inline-block;
-    font-family: 'Fredoka One', cursive;
-    font-size: 14px;
-    letter-spacing: 3px;
-    padding: 6px 18px;
-    border-radius: 20px;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-  }
-
-  .result-type-name {
-    font-family: 'Fredoka One', cursive;
-    font-size: clamp(28px, 6vw, 42px);
-    color: var(--white);
-    line-height: 1.1;
-    margin-bottom: 8px;
-  }
-
-  .result-tagline {
-    font-size: 14px;
-    color: rgba(255,253,245,0.6);
-    font-weight: 700;
-    margin-bottom: 24px;
-    letter-spacing: 0.5px;
-  }
-
-  .result-card {
-    background: var(--white);
-    border-radius: 24px;
-    padding: 24px;
-    margin-bottom: 16px;
-  }
-
-  .result-card h3 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 16px;
-    color: var(--dark);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .result-card p {
-    font-size: 14px;
-    color: #444;
-    line-height: 1.7;
-    font-weight: 600;
-  }
-
-  .strengths-list, .tips-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .strengths-list li, .tips-list li {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--dark);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    line-height: 1.4;
-  }
-
-  .strengths-list li::before { content: '✦'; color: var(--yellow); flex-shrink: 0; font-size: 12px; margin-top: 2px; }
-  .tips-list li::before { content: '→'; flex-shrink: 0; font-size: 13px; margin-top: 1px; }
-
-  .score-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .score-bar-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .score-bar-label {
-    font-family: 'Fredoka One', cursive;
-    font-size: 13px;
-    width: 32px;
-    flex-shrink: 0;
-  }
-
-  .score-bar-track {
-    flex: 1;
-    height: 12px;
-    background: #F0EDE0;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .score-bar-fill {
-    height: 100%;
-    border-radius: 10px;
-    transition: width 1s ease;
-    width: 0;
-  }
-
-  .score-bar-pct {
-    font-size: 12px;
-    font-weight: 800;
-    color: var(--dark);
-    width: 32px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .routine-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .routine-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    background: #F5F3EA;
-    border-radius: 14px;
-    padding: 12px 14px;
-  }
-
-  .step-num {
-    font-family: 'Fredoka One', cursive;
-    font-size: 16px;
-    color: var(--white);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .step-text {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--dark);
-    line-height: 1.5;
-    padding-top: 4px;
-  }
-
-  .other-types {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 4px;
-  }
-
-  .other-type-chip {
-    background: rgba(255,255,255,0.08);
-    border: 1.5px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 8px 14px;
-    text-align: center;
-    flex: 1;
-    min-width: 80px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .other-type-chip:hover { border-color: var(--yellow); background: rgba(255,214,0,0.08); }
-  .other-type-chip .chip-emoji { font-size: 22px; display: block; margin-bottom: 2px; }
-  .other-type-chip .chip-code { font-family: 'Fredoka One', cursive; font-size: 14px; color: rgba(255,253,245,0.8); }
-  .other-type-chip .chip-name { font-size: 9px; color: rgba(255,253,245,0.4); font-weight: 800; letter-spacing: 0.5px; }
-
-  .retry-btn {
-    display: block;
-    width: 100%;
-    background: var(--yellow);
-    color: var(--dark);
-    font-family: 'Fredoka One', cursive;
-    font-size: 20px;
-    padding: 18px;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 6px 0 #b39900;
-    margin-top: 24px;
-    transition: all 0.15s;
-  }
-
-  .retry-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b39900; }
-  .retry-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #b39900; }
-
-  .section-divider {
-    text-align: center;
-    font-family: 'Fredoka One', cursive;
-    font-size: 12px;
-    letter-spacing: 3px;
-    color: rgba(255,253,245,0.25);
-    margin: 20px 0 16px;
-    text-transform: uppercase;
-  }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --red:#E8302A;--red-dk:#B5201A;--red-lt:#FF6B5A;
+  --yellow:#FFE033;--yellow-dk:#D4B800;
+  --bg:#FFF5F4;--dark:#1A0A08;
+  --slot-h:88px;
+}
+html,body{width:100%;min-height:100%;background:var(--bg);font-family:'Noto Sans KR',sans-serif;overflow-x:hidden;}
+
+/* ── CONFETTI ── */
+#cvcv{position:fixed;inset:0;pointer-events:none;z-index:9999;}
+
+/* ── HEADER ── */
+.hdr{
+  background:linear-gradient(180deg,#FF4A42 0%,#E8302A 100%);
+  padding:16px 20px 14px;text-align:center;
+  box-shadow:0 4px 0 var(--red-dk);position:relative;
+}
+.hdr::after{content:'';position:absolute;bottom:-14px;left:0;right:0;height:14px;
+  background:var(--red);clip-path:ellipse(52% 100% at 50% 0%);}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:8px;}
+.logo-cat{width:36px;height:36px;background:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);}
+.logo-txt{font-family:'Black Han Sans',sans-serif;font-size:24px;color:#fff;letter-spacing:1px;}
+.logo-txt .b{color:var(--yellow);}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.7);letter-spacing:2px;margin-top:3px;}
+
+/* ── BODY ── */
+.body{padding:32px 16px 40px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+
+/* ── MACHINE CABINET ── */
+.machine{
+  width:100%;max-width:420px;
+  background:linear-gradient(160deg,#2A0E0C,#1A0604);
+  border-radius:28px;
+  border:4px solid #5A2018;
+  box-shadow:0 12px 40px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.08);
+  overflow:hidden;
+  position:relative;
+}
+/* machine top glow */
+.machine::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--yellow),transparent);
+  animation:scanline 3s linear infinite;
+}
+@keyframes scanline{0%{opacity:.4;}50%{opacity:1;}100%{opacity:.4;}}
+
+/* Machine header strip */
+.machine-hdr{
+  background:linear-gradient(180deg,#3A1208,#2A0A06);
+  padding:14px 20px 12px;text-align:center;
+  border-bottom:2px solid #5A2018;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.machine-title{
+  font-family:'Black Han Sans',sans-serif;
+  font-size:20px;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--yellow),#FFF0A0,var(--yellow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.machine-light{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--yellow);
+  box-shadow:0 0 8px var(--yellow);
+  animation:blink 1.2s ease-in-out infinite;
+}
+.machine-light.r{background:var(--red-lt);box-shadow:0 0 8px var(--red-lt);}
+@keyframes blink{0%,100%{opacity:.4;}50%{opacity:1;}}
+
+/* ── SLOT WINDOW ── */
+.slot-window{
+  margin:18px 16px;
+  background:#0A0302;
+  border-radius:16px;
+  border:3px solid #3A1008;
+  box-shadow:inset 0 4px 20px rgba(0,0,0,.8);
+  overflow:hidden;
+  position:relative;
+}
+/* Scanline overlay */
+.slot-window::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.15),rgba(0,0,0,.15) 1px,transparent 1px,transparent 3px);
+  z-index:10;
+}
+
+/* 4 reels side by side */
+.reels-row{
+  display:flex;
+  gap:0;
+  height:calc(var(--slot-h) + 4px);
+  position:relative;
+}
+
+/* Center highlight line */
+.reel-highlight{
+  position:absolute;
+  top:50%;left:8px;right:8px;
+  height:var(--slot-h);
+  transform:translateY(-50%);
+  border:3px solid var(--yellow);
+  border-radius:8px;
+  box-shadow:0 0 12px rgba(255,224,51,.5),inset 0 0 20px rgba(255,224,51,.05);
+  pointer-events:none;
+  z-index:20;
+}
+/* Left/right fade mask */
+.slot-window::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:15;
+  background:
+    linear-gradient(180deg,rgba(10,3,2,.9) 0%,transparent 28%,transparent 72%,rgba(10,3,2,.9) 100%);
+}
+
+/* Individual reel */
+.reel{
+  flex:1;
+  overflow:hidden;
+  position:relative;
+  border-right:1px solid #2A0A06;
+}
+.reel:last-child{border-right:none;}
+
+.reel-strip{
+  display:flex;flex-direction:column;
+  will-change:transform;
+  /* JS controls translateY */
+}
+
+.reel-item{
+  height:var(--slot-h);
+  flex-shrink:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:2px;
+  user-select:none;
+}
+.reel-letter{
+  font-family:'Black Han Sans',sans-serif;
+  font-size:40px;
+  line-height:1;
+  text-shadow:0 2px 8px rgba(0,0,0,.6);
+}
+.reel-pair{
+  font-size:9px;font-weight:700;letter-spacing:1px;
+  opacity:.5;text-transform:uppercase;
+}
+
+/* Reel color themes */
+.rc-ei .reel-letter{color:#FF8070;text-shadow:0 0 12px rgba(255,128,112,.4);}
+.rc-sn .reel-letter{color:#FFE033;text-shadow:0 0 12px rgba(255,224,51,.4);}
+.rc-tf .reel-letter{color:#70B4FF;text-shadow:0 0 12px rgba(112,180,255,.4);}
+.rc-jp .reel-letter{color:#70E8A8;text-shadow:0 0 12px rgba(112,232,168,.4);}
+
+/* ── REEL LABELS ── */
+.reel-labels{
+  display:flex;margin:0 16px 10px;gap:0;
+}
+.reel-label{
+  flex:1;text-align:center;
+  font-size:9px;font-weight:700;letter-spacing:2px;
+  color:rgba(255,255,255,.3);text-transform:uppercase;
+}
+
+/* ── CONTROLS ── */
+.controls{
+  padding:14px 20px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+
+/* SPIN button */
+.btn-spin{
+  width:100%;max-width:280px;
+  padding:16px;
+  border-radius:99px;
+  background:linear-gradient(180deg,var(--yellow),#D4B800);
+  border:none;border-bottom:5px solid #A08800;
+  font-family:'Black Han Sans',sans-serif;
+  font-size:20px;letter-spacing:2px;
+  color:#3A2000;cursor:pointer;
+  box-shadow:0 6px 20px rgba(255,224,51,.35);
+  transition:transform .1s,border-bottom-width .1s;
+  position:relative;overflow:hidden;
+}
+.btn-spin::before{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  animation:shine 2.5s ease-in-out infinite;
+}
+@keyframes shine{0%{left:-100%;}100%{left:200%;}}
+.btn-spin:active{transform:translateY(3px);border-bottom-width:2px;}
+.btn-spin:disabled{background:linear-gradient(180deg,#888,#555);border-bottom-color:#333;color:#aaa;cursor:default;box-shadow:none;}
+.btn-spin:disabled::before{display:none;}
+
+/* STOP buttons row */
+.stop-row{
+  display:flex;gap:8px;width:100%;max-width:320px;
+}
+.btn-stop{
+  flex:1;padding:12px 4px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#FF6B5A,var(--red));
+  border:none;border-bottom:4px solid var(--red-dk);
+  font-family:'Black Han Sans',sans-serif;
+  font-size:13px;letter-spacing:1px;color:#fff;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(232,48,42,.4);
+  transition:transform .1s,border-bottom-width .1s,opacity .2s;
+  opacity:0.35;pointer-events:none;
+}
+.btn-stop.active{opacity:1;pointer-events:auto;animation:pulse-stop .6s ease-in-out infinite;}
+.btn-stop.done{opacity:.25;pointer-events:none;background:linear-gradient(180deg,#555,#333);border-bottom-color:#222;box-shadow:none;animation:none;}
+.btn-stop:active{transform:translateY(2px);border-bottom-width:2px;}
+@keyframes pulse-stop{0%,100%{box-shadow:0 4px 12px rgba(232,48,42,.4);}50%{box-shadow:0 4px 20px rgba(232,48,42,.8);}}
+
+/* Stop labels under buttons */
+.stop-label{
+  font-size:9px;color:rgba(255,255,255,.4);text-align:center;
+  margin-top:3px;letter-spacing:1px;
+  font-weight:700;text-transform:uppercase;
+}
+
+/* ── STATUS BAR ── */
+.status-bar{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:8px 16px;
+  font-size:12px;color:rgba(255,255,255,.5);
+  letter-spacing:1px;text-align:center;
+  min-height:36px;transition:all .3s;
+}
+.status-bar.spinning{color:var(--yellow);border-color:rgba(255,224,51,.3);}
+.status-bar.done{color:#70E8A8;border-color:rgba(112,232,168,.3);}
+
+/* ── RESULT CARD ── */
+.result-wrap{
+  width:100%;max-width:420px;
+  animation:slideUp .5s cubic-bezier(.34,1.3,.64,1);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.result-card{
+  background:#fff;border-radius:24px;
+  border:3px solid var(--red);
+  box-shadow:0 8px 32px rgba(232,48,42,.18);
+  overflow:hidden;
+}
+.result-top{
+  background:linear-gradient(135deg,var(--red),#FF6B5A);
+  padding:20px 20px 16px;text-align:center;
+  position:relative;
+}
+.result-top::after{
+  content:'';position:absolute;bottom:-12px;left:0;right:0;height:12px;
+  background:linear-gradient(135deg,var(--red),#FF6B5A);
+  clip-path:ellipse(52% 100% at 50% 0%);
+}
+.result-mbti{
+  font-family:'Black Han Sans',sans-serif;
+  font-size:52px;letter-spacing:5px;color:#fff;line-height:1;
+  text-shadow:0 4px 12px rgba(0,0,0,.2);
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{transform:scale(.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.result-type-name{
+  font-size:12px;color:rgba(255,255,255,.8);letter-spacing:3px;margin-top:4px;
+  font-weight:700;text-transform:uppercase;
+}
+.result-chips{
+  display:flex;gap:6px;justify-content:center;margin-top:10px;
+}
+.result-chip{
+  padding:4px 12px;border-radius:99px;
+  font-family:'Black Han Sans',sans-serif;font-size:14px;
+  background:rgba(255,255,255,.25);color:#fff;border:1.5px solid rgba(255,255,255,.4);
+}
+
+.result-body{padding:28px 20px 20px;}
+.result-icon{font-size:42px;text-align:center;margin-bottom:8px;}
+.result-activity{
+  font-family:'Black Han Sans',sans-serif;
+  font-size:22px;color:#1A0A08;text-align:center;margin-bottom:6px;
+}
+.result-quote{
+  font-size:13px;color:var(--red);font-weight:700;text-align:center;margin-bottom:12px;
+}
+.result-desc{
+  font-size:13px;color:#555;line-height:1.7;
+  background:#FFF5F4;border-radius:12px;padding:12px 14px;
+  border-left:3px solid var(--red);margin-bottom:16px;
+}
+/* Action buttons */
+.result-actions{display:flex;flex-direction:column;gap:8px;}
+.btn-action{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:14px;
+  font-family:'Black Han Sans',sans-serif;font-size:15px;letter-spacing:1px;
+  cursor:pointer;border:none;text-decoration:none;
+  transition:transform .1s,box-shadow .1s;
+}
+.btn-action:active{transform:scale(.97);}
+.btn-primary{
+  background:var(--red);color:#fff;
+  box-shadow:0 4px 0 var(--red-dk),0 6px 16px rgba(232,48,42,.3);
+}
+.btn-secondary{
+  background:#fff;color:var(--red);
+  border:2px solid var(--red);
+}
+.btn-ghost{
+  background:rgba(232,48,42,.07);color:#888;
+  font-size:13px;
+}
+.btn-action-icon{font-size:18px;}
+
+/* ── AGAIN BUTTON (standalone) ── */
+.btn-again-wrap{width:100%;max-width:420px;}
+.btn-again{
+  width:100%;padding:14px;border-radius:14px;
+  background:rgba(232,48,42,.1);color:var(--red);
+  border:2px solid rgba(232,48,42,.25);
+  font-family:'Black Han Sans',sans-serif;font-size:16px;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;
+}
+.btn-again:hover{background:rgba(232,48,42,.15);}
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- WELCOME SCREEN -->
-  <div class="screen welcome-screen active" id="screen-welcome">
-    <span class="cat-logo">🐱</span>
-    <div class="brand-tag">BIG CAT × Teaching</div>
-    <h1 class="welcome-title">What's Your<span>Teaching Style?</span></h1>
-    <p class="welcome-subtitle">Answer 30 quick questions and discover your unique teacher personality — plus your signature lesson routine!</p>
+<canvas id="cvcv"></canvas>
 
-    <div class="type-cards-preview">
-      <div class="type-preview-card">
-        <span class="type-emoji">📋</span>
-        <div class="type-code">SJ</div>
-        <div class="type-name">The Architect</div>
-      </div>
-      <div class="type-preview-card">
-        <span class="type-emoji">⚡</span>
-        <div class="type-code">EP</div>
-        <div class="type-name">The Energizer</div>
-      </div>
-      <div class="type-preview-card">
-        <span class="type-emoji">💛</span>
-        <div class="type-code">IF</div>
-        <div class="type-name">The Nurturer</div>
-      </div>
-      <div class="type-preview-card">
-        <span class="type-emoji">🌟</span>
-        <div class="type-code">FN</div>
-        <div class="type-name">The Visionary</div>
-      </div>
-      <div class="type-preview-card">
-        <span class="type-emoji">🎯</span>
-        <div class="type-code">TJ</div>
-        <div class="type-name">The Strategist</div>
-      </div>
-    </div>
-
-    <button class="start-btn" onclick="startQuiz()">🐾 Start the Quiz!</button>
-    <div class="quiz-count-badge">30 questions · ~5 minutes</div>
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo-row">
+    <div class="logo-cat">🐱</div>
+    <div class="logo-txt"><span class="b">Beat</span>Cat</div>
   </div>
-
-  <!-- QUIZ SCREEN -->
-  <div class="screen quiz-screen" id="screen-quiz">
-    <div class="quiz-header">
-      <div class="q-counter">
-        Q<strong id="q-num">1</strong> / 30
-      </div>
-      <div class="progress-ring-wrap">
-        <svg class="progress-ring" width="56" height="56" viewBox="0 0 56 56">
-          <circle class="progress-ring-bg" cx="28" cy="28" r="22"/>
-          <circle class="progress-ring-fill" id="progress-ring-fill" cx="28" cy="28" r="22"/>
-        </svg>
-        <div class="progress-pct" id="progress-pct">0%</div>
-      </div>
-    </div>
-
-    <div class="section-badge" id="section-badge">🏫 Section 1</div>
-
-    <div class="question-card" id="question-card">
-      <span class="question-emoji" id="q-emoji">🤔</span>
-      <div class="question-text" id="q-text">Loading...</div>
-    </div>
-
-    <div class="options-list" id="options-list"></div>
-
-    <br>
-    <div class="nav-btns">
-      <button class="nav-btn prev" id="prev-btn" onclick="prevQ()">← Back</button>
-      <button class="nav-btn next" id="next-btn" onclick="nextQ()">Next →</button>
-    </div>
-  </div>
-
-  <!-- LOADING SCREEN -->
-  <div class="screen loading-screen" id="screen-loading">
-    <span class="loading-cat">🐱</span>
-    <div class="loading-text">Analyzing your teaching style...</div>
-    <div class="loading-bar-wrap">
-      <div class="loading-bar-fill"></div>
-    </div>
-  </div>
-
-  <!-- RESULT SCREEN -->
-  <div class="screen result-screen" id="screen-result">
-    <div class="result-header">
-      <span class="result-cat-icon" id="res-emoji">🐱</span>
-      <div class="result-type-badge" id="res-badge">SJ</div>
-      <div class="result-type-name" id="res-name">The Architect</div>
-      <div class="result-tagline" id="res-tagline">"Structure is freedom"</div>
-    </div>
-
-    <div class="result-card">
-      <h3>📖 Your Teaching DNA</h3>
-      <p id="res-description">...</p>
-    </div>
-
-    <div class="result-card">
-      <h3>✦ Your Superpowers</h3>
-      <ul class="strengths-list" id="res-strengths"></ul>
-    </div>
-
-    <div class="result-card">
-      <h3>📊 Your Type Scores</h3>
-      <div class="score-bars" id="score-bars"></div>
-    </div>
-
-    <div class="result-card">
-      <h3>🗓 Your Signature Lesson Routine</h3>
-      <div class="routine-steps" id="res-routine"></div>
-    </div>
-
-    <div class="result-card">
-      <h3>💡 Level-Up Tips</h3>
-      <ul class="tips-list" id="res-tips"></ul>
-    </div>
-
-    <div class="section-divider">Other Teacher Types</div>
-
-    <div class="other-types" id="other-types"></div>
-
-    <button class="retry-btn" onclick="resetQuiz()">🔄 Retake the Quiz</button>
-  </div>
-
+  <div class="hdr-sub">MBTI 슬롯 룰렛</div>
 </div>
 
+<div class="body">
+
+  <!-- SLOT MACHINE -->
+  <div class="machine">
+
+    <div class="machine-hdr">
+      <div class="machine-light"></div>
+      <div class="machine-title">🎰 MBTI SLOT</div>
+      <div class="machine-light r"></div>
+    </div>
+
+    <!-- Reel window -->
+    <div class="slot-window">
+      <div class="reel-highlight"></div>
+      <div class="reels-row">
+        <div class="reel" id="reel0"></div>
+        <div class="reel" id="reel1"></div>
+        <div class="reel" id="reel2"></div>
+        <div class="reel" id="reel3"></div>
+      </div>
+    </div>
+
+    <div class="reel-labels">
+      <div class="reel-label">E · I</div>
+      <div class="reel-label">S · N</div>
+      <div class="reel-label">T · F</div>
+      <div class="reel-label">J · P</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn-spin" id="btnSpin">🎰 &nbsp;START SPIN</button>
+
+      <div style="width:100%;max-width:320px;">
+        <div class="stop-row">
+          <button class="btn-stop" id="stop0" onclick="stopReel(0)">STOP<br><span style="font-size:10px">E·I</span></button>
+          <button class="btn-stop" id="stop1" onclick="stopReel(1)">STOP<br><span style="font-size:10px">S·N</span></button>
+          <button class="btn-stop" id="stop2" onclick="stopReel(2)">STOP<br><span style="font-size:10px">T·F</span></button>
+          <button class="btn-stop" id="stop3" onclick="stopReel(3)">STOP<br><span style="font-size:10px">J·P</span></button>
+        </div>
+      </div>
+
+      <div class="status-bar" id="statusBar">🐱 START를 눌러 슬롯을 돌려보세요!</div>
+    </div>
+  </div>
+
+  <!-- RESULT (hidden initially) -->
+  <div class="result-wrap" id="resultWrap" style="display:none;"></div>
+
+  <!-- AGAIN -->
+  <div class="btn-again-wrap" id="againWrap" style="display:none;">
+    <button class="btn-again" onclick="resetAll()">🔄 &nbsp;다시 돌리기</button>
+  </div>
+
+</div><!-- /body -->
+
 <script>
-// ===== QUESTIONS (30) =====
-const questions = [
-  // Section 1: Planning & Structure (Q1-6)
-  { section: "📋 Planning & Structure", emoji: "📅", text: "How do you typically prepare for a lesson?", options: [
-    { text: "I create a detailed plan with timed segments", type: "SJ", val: 3 },
-    { text: "I have a rough idea and improvise freely", type: "EP", val: 3 },
-    { text: "I think about what each student might need", type: "IF", val: 3 },
-    { text: "I sketch a big creative theme and build around it", type: "FN", val: 3 },
-    { text: "I set specific goals and plan backwards", type: "TJ", val: 3 }
-  ]},
-  { section: "📋 Planning & Structure", emoji: "⏰", text: "When class runs over time, you usually...", options: [
-    { text: "Stick to the schedule even if it means cutting content", type: "SJ", val: 3 },
-    { text: "Keep going — the energy matters more!", type: "EP", val: 3 },
-    { text: "Check in with students first before deciding", type: "IF", val: 3 },
-    { text: "Go with the creative flow of the moment", type: "FN", val: 3 },
-    { text: "Efficiently prioritize the must-do items", type: "TJ", val: 3 }
-  ]},
-  { section: "📋 Planning & Structure", emoji: "📚", text: "How much do you rely on your lesson materials?", options: [
-    { text: "Very much — I follow the textbook closely", type: "SJ", val: 3 },
-    { text: "I use them loosely as a starting point", type: "EP", val: 3 },
-    { text: "I adapt them to fit student emotions on the day", type: "IF", val: 3 },
-    { text: "I mix and remix from many creative sources", type: "FN", val: 3 },
-    { text: "I select strategically based on learning objectives", type: "TJ", val: 3 }
-  ]},
-  { section: "📋 Planning & Structure", emoji: "🔄", text: "When your lesson plan doesn't work as expected:", options: [
-    { text: "I feel uncomfortable and try to get back on track", type: "SJ", val: 3 },
-    { text: "I get excited — time to improvise!", type: "EP", val: 3 },
-    { text: "I check how students are feeling first", type: "IF", val: 3 },
-    { text: "I pivot to something even more creative", type: "FN", val: 3 },
-    { text: "I quickly analyze and adjust my strategy", type: "TJ", val: 3 }
-  ]},
-  { section: "📋 Planning & Structure", emoji: "📝", text: "Your lesson notes look like...", options: [
-    { text: "Detailed, color-coded, and organized by step", type: "SJ", val: 3 },
-    { text: "Barely any notes — it's all in my head", type: "EP", val: 3 },
-    { text: "Notes about individual students' needs", type: "IF", val: 3 },
-    { text: "Mind maps and concept sketches everywhere", type: "FN", val: 3 },
-    { text: "Bullet-pointed objectives and success criteria", type: "TJ", val: 3 }
-  ]},
-  { section: "📋 Planning & Structure", emoji: "🗂", text: "How do you organize your classroom resources?", options: [
-    { text: "Neatly filed with a consistent naming system", type: "SJ", val: 3 },
-    { text: "I find things when I need them!", type: "EP", val: 3 },
-    { text: "Organized by student group preferences", type: "IF", val: 3 },
-    { text: "Creatively themed collections and idea boards", type: "FN", val: 3 },
-    { text: "Sorted by learning outcome and efficiency", type: "TJ", val: 3 }
-  ]},
-  // Section 2: Classroom Energy & Interaction (Q7-12)
-  { section: "⚡ Classroom Energy", emoji: "🎉", text: "What's your ideal classroom energy level?", options: [
-    { text: "Calm and focused with productive quiet", type: "SJ", val: 3 },
-    { text: "Buzzing, loud, full of movement!", type: "EP", val: 3 },
-    { text: "Warm and safe — comfortable for everyone", type: "IF", val: 3 },
-    { text: "Imaginative and full of wonder", type: "FN", val: 3 },
-    { text: "Focused and outcome-driven", type: "TJ", val: 3 }
-  ]},
-  { section: "⚡ Classroom Energy", emoji: "🙋", text: "A student interrupts with an off-topic question. You...", options: [
-    { text: "Gently redirect them back to the lesson", type: "SJ", val: 3 },
-    { text: "Jump into it — it might spark great discussion!", type: "EP", val: 3 },
-    { text: "Listen fully and validate their curiosity", type: "IF", val: 3 },
-    { text: "Connect it creatively to what you're teaching", type: "FN", val: 3 },
-    { text: "Note it for later so you don't lose momentum", type: "TJ", val: 3 }
-  ]},
-  { section: "⚡ Classroom Energy", emoji: "🎮", text: "Games and activities in your class are usually...", options: [
-    { text: "Pre-planned with clear rules", type: "SJ", val: 3 },
-    { text: "Spontaneous and competitive!", type: "EP", val: 3 },
-    { text: "Cooperative and emotionally inclusive", type: "IF", val: 3 },
-    { text: "Creative and role-play based", type: "FN", val: 3 },
-    { text: "Challenge-based with clear targets", type: "TJ", val: 3 }
-  ]},
-  { section: "⚡ Classroom Energy", emoji: "😴", text: "When students seem bored or disengaged, you...", options: [
-    { text: "Add a structured review activity", type: "SJ", val: 3 },
-    { text: "Jump up and do something wild!", type: "EP", val: 3 },
-    { text: "Check in one-on-one to understand why", type: "IF", val: 3 },
-    { text: "Switch to a totally unexpected activity", type: "FN", val: 3 },
-    { text: "Identify the issue and solve it efficiently", type: "TJ", val: 3 }
-  ]},
-  { section: "⚡ Classroom Energy", emoji: "🗣", text: "When facilitating group discussion, you prefer to...", options: [
-    { text: "Use structured turn-taking and clear prompts", type: "SJ", val: 3 },
-    { text: "Let conversations flow freely and energetically", type: "EP", val: 3 },
-    { text: "Make sure quieter students feel heard", type: "IF", val: 3 },
-    { text: "Pose imaginative 'what if' scenarios", type: "FN", val: 3 },
-    { text: "Guide discussion toward specific conclusions", type: "TJ", val: 3 }
-  ]},
-  { section: "⚡ Classroom Energy", emoji: "🏃", text: "Physical movement in your lessons is...", options: [
-    { text: "Planned — TPR activities at specific times", type: "SJ", val: 3 },
-    { text: "Constant — we're always up and moving!", type: "EP", val: 3 },
-    { text: "Used when students seem to need a reset", type: "IF", val: 3 },
-    { text: "Part of storytelling and dramatic activities", type: "FN", val: 3 },
-    { text: "Strategic — only when it aids learning goals", type: "TJ", val: 3 }
-  ]},
-  // Section 3: Student Relationships (Q13-18)
-  { section: "💛 Student Relationships", emoji: "🤝", text: "How do you build rapport with new students?", options: [
-    { text: "Establish clear expectations and routines", type: "SJ", val: 3 },
-    { text: "Be my loudest, funniest self right away", type: "EP", val: 3 },
-    { text: "Observe quietly and learn what each child needs", type: "IF", val: 3 },
-    { text: "Share stories and spark imagination together", type: "FN", val: 3 },
-    { text: "Show competence and earn their trust through results", type: "TJ", val: 3 }
-  ]},
-  { section: "💛 Student Relationships", emoji: "😢", text: "A student is upset during class. You...", options: [
-    { text: "Help them rejoin the routine when they're ready", type: "SJ", val: 3 },
-    { text: "Try to cheer them up with humor or energy", type: "EP", val: 3 },
-    { text: "Stop everything and give them full attention", type: "IF", val: 3 },
-    { text: "Invite them into a calming creative activity", type: "FN", val: 3 },
-    { text: "Handle it efficiently and get back on track", type: "TJ", val: 3 }
-  ]},
-  { section: "💛 Student Relationships", emoji: "🌱", text: "How do you help shy students participate?", options: [
-    { text: "Use structured formats that lower pressure", type: "SJ", val: 3 },
-    { text: "Encourage loudly and celebrate every attempt", type: "EP", val: 3 },
-    { text: "Build their confidence gently over time", type: "IF", val: 3 },
-    { text: "Give them creative roles they can shine in", type: "FN", val: 3 },
-    { text: "Set achievable participation targets", type: "TJ", val: 3 }
-  ]},
-  { section: "💛 Student Relationships", emoji: "⭐", text: "You celebrate student success by...", options: [
-    { text: "Updating progress charts and portfolios", type: "SJ", val: 3 },
-    { text: "Making it a HUGE class celebration!", type: "EP", val: 3 },
-    { text: "Writing personal, heartfelt feedback", type: "IF", val: 3 },
-    { text: "Creating a creative showcase moment", type: "FN", val: 3 },
-    { text: "Showing data on how much they've improved", type: "TJ", val: 3 }
-  ]},
-  { section: "💛 Student Relationships", emoji: "😤", text: "When a student misbehaves, you typically...", options: [
-    { text: "Apply your established classroom rules consistently", type: "SJ", val: 3 },
-    { text: "Use humor to redirect them", type: "EP", val: 3 },
-    { text: "Have a private conversation to understand why", type: "IF", val: 3 },
-    { text: "Channel their energy into a creative task", type: "FN", val: 3 },
-    { text: "Address it directly and implement a clear consequence", type: "TJ", val: 3 }
-  ]},
-  { section: "💛 Student Relationships", emoji: "🎁", text: "What's your biggest gift as a teacher?", options: [
-    { text: "Creating consistent, safe routines", type: "SJ", val: 3 },
-    { text: "Making every lesson feel like an adventure", type: "EP", val: 3 },
-    { text: "Making every student feel truly seen", type: "IF", val: 3 },
-    { text: "Igniting lifelong curiosity and love of learning", type: "FN", val: 3 },
-    { text: "Helping students achieve measurable results", type: "TJ", val: 3 }
-  ]},
-  // Section 4: Teaching Approach (Q19-24)
-  { section: "🌟 Teaching Approach", emoji: "💡", text: "When introducing new vocabulary, you prefer to...", options: [
-    { text: "Present a neat list with definitions and examples", type: "SJ", val: 3 },
-    { text: "Use games, chants, or flashcard battles", type: "EP", val: 3 },
-    { text: "Connect words to students' personal experiences", type: "IF", val: 3 },
-    { text: "Build a story around the new words", type: "FN", val: 3 },
-    { text: "Use spaced repetition and strategic review", type: "TJ", val: 3 }
-  ]},
-  { section: "🌟 Teaching Approach", emoji: "🎨", text: "Creativity in your classroom means...", options: [
-    { text: "Following the curriculum creatively within structure", type: "SJ", val: 3 },
-    { text: "Making noise, making mess, making memories!", type: "EP", val: 3 },
-    { text: "Space for personal expression and sharing", type: "IF", val: 3 },
-    { text: "Imaginative worlds, stories, and big ideas", type: "FN", val: 3 },
-    { text: "Finding innovative solutions to learning challenges", type: "TJ", val: 3 }
-  ]},
-  { section: "🌟 Teaching Approach", emoji: "🎯", text: "How do you handle mixed-level students in one class?", options: [
-    { text: "Differentiated worksheets for each level", type: "SJ", val: 3 },
-    { text: "High-energy team activities where all can join", type: "EP", val: 3 },
-    { text: "Buddy systems with peer emotional support", type: "IF", val: 3 },
-    { text: "Flexible creative projects with open outcomes", type: "FN", val: 3 },
-    { text: "Strategic grouping to maximize growth", type: "TJ", val: 3 }
-  ]},
-  { section: "🌟 Teaching Approach", emoji: "📱", text: "Technology in your lessons is...", options: [
-    { text: "Useful when it fits neatly into my plan", type: "SJ", val: 3 },
-    { text: "The more interactive and fun the better!", type: "EP", val: 3 },
-    { text: "Great for personalizing content to students", type: "IF", val: 3 },
-    { text: "A canvas for creative digital projects", type: "FN", val: 3 },
-    { text: "Valuable when it improves measurable outcomes", type: "TJ", val: 3 }
-  ]},
-  { section: "🌟 Teaching Approach", emoji: "✍️", text: "Grammar instruction in your class looks like...", options: [
-    { text: "Clear explanation with structured practice", type: "SJ", val: 3 },
-    { text: "Grammar games and energetic drills", type: "EP", val: 3 },
-    { text: "Noticing grammar through meaningful texts", type: "IF", val: 3 },
-    { text: "Discovering patterns through creative stories", type: "FN", val: 3 },
-    { text: "Targeted correction and tracked improvement", type: "TJ", val: 3 }
-  ]},
-  { section: "🌟 Teaching Approach", emoji: "🔁", text: "Review and recycling of content happens...", options: [
-    { text: "On a fixed schedule in my unit plan", type: "SJ", val: 3 },
-    { text: "Whenever the energy calls for a fun review game", type: "EP", val: 3 },
-    { text: "Based on who seems to be struggling", type: "IF", val: 3 },
-    { text: "Through creative retellings and new contexts", type: "FN", val: 3 },
-    { text: "Based on data from formative assessment", type: "TJ", val: 3 }
-  ]},
-  // Section 5: Assessment & Growth (Q25-30)
-  { section: "🎯 Assessment & Growth", emoji: "📊", text: "How do you assess student progress?", options: [
-    { text: "Regular quizzes, tests, and written work", type: "SJ", val: 3 },
-    { text: "Observing enthusiasm and participation", type: "EP", val: 3 },
-    { text: "Conversations and emotional check-ins", type: "IF", val: 3 },
-    { text: "Creative portfolios and project work", type: "FN", val: 3 },
-    { text: "Data-driven tracking against clear benchmarks", type: "TJ", val: 3 }
-  ]},
-  { section: "🎯 Assessment & Growth", emoji: "📬", text: "Parent communication from you sounds like...", options: [
-    { text: "Formal, structured reports on schedule", type: "SJ", val: 3 },
-    { text: "Enthusiastic stories about great class moments", type: "EP", val: 3 },
-    { text: "Warm, personal notes about their child specifically", type: "IF", val: 3 },
-    { text: "Sharing exciting project stories and creative wins", type: "FN", val: 3 },
-    { text: "Clear progress data with actionable next steps", type: "TJ", val: 3 }
-  ]},
-  { section: "🎯 Assessment & Growth", emoji: "🧑‍🏫", text: "What kind of teacher development excites you most?", options: [
-    { text: "Practical workshops on classroom management systems", type: "SJ", val: 3 },
-    { text: "High-energy conferences with new activity ideas", type: "EP", val: 3 },
-    { text: "Wellbeing and student-centered learning seminars", type: "IF", val: 3 },
-    { text: "Innovative pedagogy and creative curriculum design", type: "FN", val: 3 },
-    { text: "Research-based evidence on what actually works", type: "TJ", val: 3 }
-  ]},
-  { section: "🎯 Assessment & Growth", emoji: "💬", text: "After a lesson, you most often think about...", options: [
-    { text: "Whether I covered everything in my plan", type: "SJ", val: 3 },
-    { text: "That amazing moment when the class lit up!", type: "EP", val: 3 },
-    { text: "How each individual student was feeling", type: "IF", val: 3 },
-    { text: "The creative spark that surprised everyone", type: "FN", val: 3 },
-    { text: "The data — what improved and what didn't", type: "TJ", val: 3 }
-  ]},
-  { section: "🎯 Assessment & Growth", emoji: "🌍", text: "Your teaching philosophy in one sentence would be...", options: [
-    { text: "Consistent structure builds confident learners", type: "SJ", val: 3 },
-    { text: "If it's not fun, it's not learning!", type: "EP", val: 3 },
-    { text: "Every child deserves to feel they belong", type: "IF", val: 3 },
-    { text: "Learning is the greatest adventure of all", type: "FN", val: 3 },
-    { text: "Clear goals and smart methods get real results", type: "TJ", val: 3 }
-  ]},
-  { section: "🎯 Assessment & Growth", emoji: "🚀", text: "In 5 years, you want your teaching to be known for...", options: [
-    { text: "Running the most organized, reliable classes", type: "SJ", val: 3 },
-    { text: "Being the most memorable, energetic teacher ever", type: "EP", val: 3 },
-    { text: "Changing lives through genuine connection", type: "IF", val: 3 },
-    { text: "Inspiring a generation of creative thinkers", type: "FN", val: 3 },
-    { text: "Delivering consistently outstanding outcomes", type: "TJ", val: 3 }
-  ]}
+/* ══ DATA ══ */
+const PAIRS=[
+  {letters:['E','I'], colors:['#FF8070','#FF8070'], label:'E·I', theme:'rc-ei'},
+  {letters:['S','N'], colors:['#FFE033','#FFE033'], label:'S·N', theme:'rc-sn'},
+  {letters:['T','F'], colors:['#70B4FF','#70B4FF'], label:'T·F', theme:'rc-tf'},
+  {letters:['J','P'], colors:['#70E8A8','#70E8A8'], label:'J·P', theme:'rc-jp'},
 ];
 
-// ===== TEACHER TYPES =====
-const teacherTypes = {
-  SJ: {
-    code: "SJ",
-    name: "The Architect",
-    tagline: '"Structure is freedom."',
-    emoji: "📋",
-    color: "#00B4D8",
-    accent: "#005f73",
-    description: "You are the backbone of every school. Your lessons are meticulously planned, your systems are airtight, and your students always know exactly what to expect. You create psychological safety through consistency — students thrive in your classroom because they feel secure. You believe that real learning happens within well-designed frameworks.",
-    strengths: [
-      "Master of classroom management and routines",
-      "Exceptional at lesson planning and curriculum mapping",
-      "Students always feel safe and clear about expectations",
-      "Excellent at tracking progress and maintaining records",
-      "Reliable, consistent, and deeply professional"
-    ],
-    routine: [
-      { step: "Warm-Up Review", desc: "Structured review of previous lesson with a quick quiz or pair-share", color: "#00B4D8" },
-      { step: "Clear Objective", desc: "State the lesson goal explicitly — 'By the end, you will be able to...'", color: "#0096c7" },
-      { step: "Direct Instruction", desc: "Present new content with organized visual aids and clear examples", color: "#0077b6" },
-      { step: "Guided Practice", desc: "Structured activities with teacher monitoring and error correction", color: "#023e8a" },
-      { step: "Independent Work", desc: "Students apply learning individually with clear task instructions", color: "#03045e" },
-      { step: "Exit Check", desc: "Quick assessment to verify understanding before next class", color: "#00B4D8" }
-    ],
-    tips: [
-      "Allow space for spontaneous student-led moments — magic happens there",
-      "Try one unplanned activity per week to build flexibility",
-      "Remember: sometimes the best learning isn't in the plan"
-    ]
-  },
-  EP: {
-    code: "EP",
-    name: "The Energizer",
-    tagline: '"If it\'s not fun, it\'s not learning!"',
-    emoji: "⚡",
-    color: "#FF6B35",
-    accent: "#c44b1f",
-    description: "You are the human caffeine shot of the teaching world. Your classroom buzzes with excitement, laughter, and genuine joy. Students remember your lessons for years because you make English feel like the best game they've ever played. You have an instinctive talent for reading the room and shifting energy levels perfectly. You don't just teach — you perform, inspire, and electrify.",
-    strengths: [
-      "Unmatched ability to create engagement and motivation",
-      "Intuitive classroom energy management",
-      "Spontaneous creativity and improvisation under pressure",
-      "Making every student feel excited to come to class",
-      "Building classroom culture that buzzes with positivity"
-    ],
-    routine: [
-      { step: "Energy Opener", desc: "High-energy chant, song, or competitive quick game to ignite the room", color: "#FF6B35" },
-      { step: "Hook Activity", desc: "Something surprising, funny, or mysterious to grab everyone's attention", color: "#e85d04" },
-      { step: "Live Demo", desc: "Teacher models with exaggerated energy and student participation", color: "#dc2f02" },
-      { step: "Team Challenge", desc: "Competitive group activity with points, badges, or class prizes", color: "#d00000" },
-      { step: "Performance Time", desc: "Students show off — role plays, presentations, or quick debates", color: "#9d0208" },
-      { step: "Celebration Close", desc: "Big class celebration of today's wins with energy and recognition", color: "#FF6B35" }
-    ],
-    tips: [
-      "Build in one quiet, reflective moment per class — balance is power",
-      "Channel your energy into structured games so learning sticks",
-      "Document what works! Your spontaneous ideas are gold"
-    ]
-  },
-  IF: {
-    code: "IF",
-    name: "The Nurturer",
-    tagline: '"Every child deserves to feel they belong."',
-    emoji: "💛",
-    color: "#06D6A0",
-    accent: "#028a5b",
-    description: "You are the emotional heart of your school. Students don't just learn in your classroom — they heal, grow, and discover who they are. You notice the quiet student in the corner before anyone else does. Your superpower is making every single learner feel genuinely seen and valued. Your classroom is a sanctuary. Students carry the feeling of being loved by you for the rest of their lives.",
-    strengths: [
-      "Extraordinary emotional intelligence and empathy",
-      "Building deep, lasting relationships with every student",
-      "Creating inclusive environments where no one feels left out",
-      "Personalizing learning to individual emotional needs",
-      "Supporting the whole child, not just academic performance"
-    ],
-    routine: [
-      { step: "Heart Check-In", desc: "Emotional warmup — mood check, sharing circle, or feelings journal", color: "#06D6A0" },
-      { step: "Connection Bridge", desc: "Link today's theme to students' real lives and personal stories", color: "#05b386" },
-      { step: "Collaborative Learning", desc: "Pair and group activities focused on support and peer learning", color: "#049066" },
-      { step: "Personal Expression", desc: "Students respond to content through personal writing or sharing", color: "#036d4c" },
-      { step: "Empathy Activity", desc: "Perspective-taking task — stories, characters, or real-world issues", color: "#024a33" },
-      { step: "Gratitude Close", desc: "End with appreciation — students share one thing they valued today", color: "#06D6A0" }
-    ],
-    tips: [
-      "Build in more structured academic accountability — compassion + rigor = magic",
-      "Use your emotional insights to differentiate more by skill level",
-      "Remember to refuel your own energy — you give so much to others"
-    ]
-  },
-  FN: {
-    code: "FN",
-    name: "The Visionary",
-    tagline: '"Learning is the greatest adventure of all."',
-    emoji: "🌟",
-    color: "#FFD600",
-    accent: "#b39900",
-    description: "You are a world-builder. Your classroom doesn't follow curriculum — it transcends it. You see connections between ideas that nobody else sees, and your lessons leave students with a feeling that English is a superpower for exploring the universe. Your creativity is legendary. You are the teacher students talk about when they're grown up, saying 'that teacher changed how I think about everything.'",
-    strengths: [
-      "Extraordinary creative curriculum design",
-      "Inspiring genuine intellectual curiosity",
-      "Connecting language learning to big ideas and real purpose",
-      "Creating unforgettable, meaningful learning experiences",
-      "Making abstract concepts vivid and personally relevant"
-    ],
-    routine: [
-      { step: "Story World Open", desc: "Begin inside a story, mystery, or imaginative scenario to set the scene", color: "#FFD600" },
-      { step: "Wonder Question", desc: "Pose a big 'what if' or 'why' question that students are desperate to explore", color: "#fcc200" },
-      { step: "Discovery Journey", desc: "Students explore the content through investigation, creation, or inquiry", color: "#f9a800" },
-      { step: "Creative Workshop", desc: "Make, build, design, or write something meaningful using the language", color: "#f08c00" },
-      { step: "Gallery Share", desc: "Students present and celebrate each other's creative output", color: "#e07800" },
-      { step: "Big Idea Reflection", desc: "Zoom out — what does today's learning mean for the bigger picture?", color: "#FFD600" }
-    ],
-    tips: [
-      "Build consistent assessment into your creative projects — document the magic",
-      "Create recurring class rituals so students have structure inside the creativity",
-      "Your ideas are extraordinary — now teach others your process"
-    ]
-  },
-  TJ: {
-    code: "TJ",
-    name: "The Strategist",
-    tagline: '"Clear goals and smart methods get real results."',
-    emoji: "🎯",
-    color: "#7B2FBE",
-    accent: "#4a1080",
-    description: "You are the architect of outcomes. You don't just teach English — you engineer success. Your data-driven, evidence-based approach means students in your class make measurable, undeniable progress. You are respected by parents, admired by colleagues, and trusted by school leaders. You know exactly what works and why, and you apply it with precision and purpose every single day.",
-    strengths: [
-      "Evidence-based, data-driven instructional decisions",
-      "Setting ambitious and achievable learning targets",
-      "Tracking, analyzing, and responding to student performance",
-      "Running highly efficient, results-focused lessons",
-      "Professional credibility and curriculum expertise"
-    ],
-    routine: [
-      { step: "Data Check", desc: "Review what the data says about where students are today", color: "#7B2FBE" },
-      { step: "Objective Set", desc: "Share precise, measurable lesson targets with students", color: "#6a25a8" },
-      { step: "Strategic Input", desc: "Evidence-based instruction using proven high-impact methods", color: "#591b92" },
-      { step: "Targeted Practice", desc: "Differentiated tasks matched precisely to each student's level", color: "#48117c" },
-      { step: "Formative Check", desc: "Quick assessment tool to measure learning in real time", color: "#370866" },
-      { step: "Progress Update", desc: "Students record their own progress and set next targets", color: "#7B2FBE" }
-    ],
-    tips: [
-      "Schedule one 'joy activity' per week — student happiness drives long-term results",
-      "Let students surprise you sometimes — not everything needs a metric",
-      "Your strategic clarity is a gift — help mentor other teachers with it"
-    ]
-  }
+const MBTI_DATA={
+  INTJ:{icon:'🎯',name:'전략가',activity:'격파 뒤 단어 꺼내기',quote:'"Step 1 clear! Next mission!"',desc:'단계형 전략 수업 — 블록 격파 뒤 숨겨진 단어 카드를 꺼내는 미션 게임'},
+  INTP:{icon:'🤔',name:'사색가',activity:'Why vs Because',quote:'"Why? → Because!"',desc:'질문-이유 구조 게임 — WHY 팀 vs BECAUSE 팀으로 나뉘어 논리적으로 토론'},
+  ENTJ:{icon:'❗',name:'지휘관',activity:'문장부호 팀 미션',quote:'"This is a question!"',desc:'역할 기반 참여 — ❗❓ 역할 팀 미션으로 문장 구조를 익히는 게임'},
+  ENTP:{icon:'💡',name:'토론자',activity:'아인슈타인 게임',quote:'"Wait! I have an idea!"',desc:'규칙 변화 & 창의성 — CVC 릴레이 + 규칙 변경으로 창의력을 키우는 활동'},
+  INFJ:{icon:'🎬',name:'안내자',activity:'오스카상 역할극',quote:'"You are the main character!"',desc:'몰입 역할극 — 오스카상 역할 미션으로 깊이 있는 캐릭터 표현 활동'},
+  INFP:{icon:'🌈',name:'몽상가',activity:'Copy Me',quote:'"Show me your way!"',desc:'창의 표현 — 나만의 단어 동작을 만들고 친구들과 함께 따라하는 활동'},
+  ENFJ:{icon:'🤝',name:'선도자',activity:'마칭 팀워크',quote:'"Let\'s do it together!"',desc:'협력 발화 — 2인3각/5인6각으로 함께 움직이며 문장을 말하는 활동'},
+  ENFP:{icon:'🔥',name:'활력가',activity:'Better than Me',quote:'"Better than me!"',desc:'에너지 확장 — 리액션 업 챌린지로 점점 더 크게 반응하며 표현력 강화'},
+  ISTJ:{icon:'🤫',name:'관리자',activity:'Whisper and Say',quote:'"Listen carefully…"',desc:'정확 전달 — 귓속말로 정확하게 전달하고 크게 말하는 체인 게임'},
+  ISFJ:{icon:'🌊',name:'보호자',activity:'중력 vs 무중력',quote:'"Slow… slower…"',desc:'속도 조절 — 중력과 무중력 상황을 표현하며 속도 감각을 익히는 활동'},
+  ESTJ:{icon:'🎖️',name:'통솔자',activity:'군대 룰 게임',quote:'"Follow the rules!"',desc:'규칙 & 통제 — 군대 BGM에 맞춰 구령에 따라 정확하게 행동하는 게임'},
+  ESFJ:{icon:'👏',name:'지지자',activity:'Good Job 챈트',quote:'"Oh~ Oh~ Good job!!"',desc:'칭찬 & 분위기 — 박수 챈트로 서로를 칭찬하며 긍정 에너지를 나누는 활동'},
+  ISTP:{icon:'✋',name:'장인',activity:'파트너 손바닥 쓰기',quote:'"Feel and guess!"',desc:'촉각 체험 — 파트너 손바닥에 단어를 써서 맞추는 감각 활동'},
+  ISFP:{icon:'🎨',name:'예술가',activity:'감정선 이동',quote:'"Feel it and move!"',desc:'감정 표현 — 감정선을 따라 이동하며 몸으로 표현하는 창의 활동'},
+  ESTP:{icon:'🏃',name:'사업가',activity:'레이스 게임',quote:'"Go! Go! Friend!!"',desc:'속도 경쟁 — 발화 후 레이스로 빠르게 말하고 달리는 에너지 넘치는 게임'},
+  ESFP:{icon:'⭐',name:'연예인',activity:'골 세리머니',quote:'"Show your moment!"',desc:'퍼포먼스 — 나만의 골 세리머니를 만들어 무대에서 선보이는 쇼타임!'},
 };
 
-// ===== STATE =====
-let current = 0;
-let answers = {};
-let scores = { SJ: 0, EP: 0, IF: 0, FN: 0, TJ: 0 };
+// Activity card links — fill in your actual URLs
+const ACTIVITY_LINKS={
+  INTJ:'#activity-intj', INTP:'#activity-intp', ENTJ:'#activity-entj', ENTP:'#activity-entp',
+  INFJ:'#activity-infj', INFP:'#activity-infp', ENFJ:'#activity-enfj', ENFP:'#activity-enfp',
+  ISTJ:'#activity-istj', ISFJ:'#activity-isfj', ESTJ:'#activity-estj', ESFJ:'#activity-esfj',
+  ISTP:'#activity-istp', ISFP:'#activity-isfp', ESTP:'#activity-estp', ESFP:'#activity-esfp',
+};
 
-function startQuiz() {
-  showScreen('quiz');
-  renderQuestion();
-}
+/* ══ REEL SETUP ══ */
+const SLOT_H=88;
+// Each reel strips — 20 items tall for smooth infinite scroll
+const REEL_COUNT=20;
 
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  window.scrollTo(0, 0);
-}
+let reelStrips=[null,null,null,null]; // DOM refs to strip divs
+let reelOffsets=[0,0,0,0];  // current px offset
+let reelTargets=[0,0,0,0];  // target px
+let reelSpeeds=[0,0,0,0];   // px/frame
+let reelSpinning=[false,false,false,false];
+let reelResults=['','','',''];
+let stopQueue=[false,false,false,false];
+let rafs=[null,null,null,null];
 
-function renderQuestion() {
-  const q = questions[current];
-  document.getElementById('q-num').textContent = current + 1;
-  document.getElementById('q-emoji').textContent = q.emoji;
-  document.getElementById('q-text').textContent = q.text;
-  document.getElementById('section-badge').textContent = q.section;
-
-  // Shuffle options (keep original index)
-  const opts = q.options.map((o, i) => ({ ...o, origIdx: i }));
-
-  const labels = ['A', 'B', 'C', 'D', 'E'];
-  const list = document.getElementById('options-list');
-  list.innerHTML = '';
-  opts.forEach((opt, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'option-btn' + (answers[current] === opt.type ? ' selected' : '');
-    btn.innerHTML = `<span class="option-label">${labels[idx]}</span><span>${opt.text}</span>`;
-    btn.onclick = () => selectOption(opt.type, btn);
-    list.appendChild(btn);
-  });
-
-  // Progress ring
-  const pct = Math.round((current / 30) * 100);
-  const fill = document.getElementById('progress-ring-fill');
-  const circumference = 138;
-  fill.style.strokeDashoffset = circumference - (circumference * pct / 100);
-  document.getElementById('progress-pct').textContent = pct + '%';
-
-  // Nav buttons
-  document.getElementById('prev-btn').disabled = current === 0;
-  document.getElementById('next-btn').textContent = current === 29 ? '🎉 See Results!' : 'Next →';
-
-  // Animate card
-  const card = document.getElementById('question-card');
-  card.style.animation = 'none';
-  requestAnimationFrame(() => { card.style.animation = 'slideIn 0.3s ease'; });
-}
-
-function selectOption(type, btn) {
-  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  answers[current] = type;
-}
-
-function nextQ() {
-  if (!answers[current]) {
-    document.getElementById('question-card').style.transform = 'translateX(-6px)';
-    setTimeout(() => document.getElementById('question-card').style.transform = '', 300);
-    return;
+function buildReel(idx){
+  const pair=PAIRS[idx];
+  const strip=document.createElement('div');
+  strip.className='reel-strip';
+  strip.id='strip'+idx;
+  // Build N items alternating letters
+  for(let i=0;i<REEL_COUNT;i++){
+    const letter=pair.letters[i%2];
+    const item=document.createElement('div');
+    item.className=`reel-item ${pair.theme}`;
+    item.innerHTML=`<div class="reel-letter">${letter}</div><div class="reel-pair">${pair.label}</div>`;
+    strip.appendChild(item);
   }
-  if (current === 29) {
-    calculateResult();
-    return;
+  document.getElementById('reel'+idx).appendChild(strip);
+  reelStrips[idx]=strip;
+  // Start centered
+  const startY=-(SLOT_H*2); // show item index 2 in center
+  strip.style.transform=`translateY(${startY}px)`;
+  reelOffsets[idx]=startY;
+}
+
+/* ══ SPIN LOGIC ══ */
+let phase='idle'; // idle | spinning | done
+let stoppedCount=0;
+
+function startAllReels(){
+  phase='spinning';stoppedCount=0;
+  reelResults=['','','',''];
+
+  // UI
+  document.getElementById('btnSpin').disabled=true;
+  document.getElementById('statusBar').className='status-bar spinning';
+  document.getElementById('statusBar').textContent='🎰 슬롯이 돌아가고 있어요! STOP을 눌러 멈추세요!';
+  document.getElementById('resultWrap').style.display='none';
+  document.getElementById('againWrap').style.display='none';
+
+  for(let i=0;i<4;i++){
+    stopQueue[i]=false;
+    reelSpinning[i]=true;
+    // Random speed 14-20 px/frame
+    reelSpeeds[i]=14+Math.random()*6;
+    animateReel(i);
   }
-  current++;
-  renderQuestion();
+
+  // Activate stop buttons sequentially
+  activateStop(0);
 }
 
-function prevQ() {
-  if (current > 0) { current--; renderQuestion(); }
+function activateStop(idx){
+  if(idx>=4)return;
+  const btn=document.getElementById('stop'+idx);
+  btn.className='btn-stop active';
 }
 
-function calculateResult() {
-  showScreen('loading');
-  scores = { SJ: 0, EP: 0, IF: 0, FN: 0, TJ: 0 };
-  Object.values(answers).forEach(type => { if (scores[type] !== undefined) scores[type]++; });
+function stopReel(idx){
+  if(!reelSpinning[idx])return;
+  if(document.getElementById('stop'+idx).className.indexOf('active')<0)return;
 
-  setTimeout(() => {
-    const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
-    renderResult(top);
-    showScreen('result');
-  }, 2000);
+  // Mark for stop
+  stopQueue[idx]=true;
+  document.getElementById('stop'+idx).className='btn-stop done';
+
+  // Update status
+  const labels=['E/I','S/N','T/F','J/P'];
+  document.getElementById('statusBar').textContent=`⏹ ${labels[idx]} 멈추는 중...`;
 }
 
-function renderResult(typeCode) {
-  const t = teacherTypes[typeCode];
-  const total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
+function animateReel(idx){
+  if(!reelSpinning[idx])return;
+  const strip=reelStrips[idx];
+  const totalH=SLOT_H*REEL_COUNT;
 
-  document.getElementById('res-emoji').textContent = t.emoji;
-  document.getElementById('res-name').textContent = t.name;
-  document.getElementById('res-tagline').textContent = t.tagline;
+  // Advance position
+  reelOffsets[idx]-=reelSpeeds[idx];
 
-  const badge = document.getElementById('res-badge');
-  badge.textContent = t.code;
-  badge.style.background = t.color;
-  badge.style.color = '#fff';
+  // Wrap around for infinite scroll
+  if(reelOffsets[idx]<-(totalH-SLOT_H*3)){
+    reelOffsets[idx]+=totalH;
+  }
 
-  document.getElementById('res-description').textContent = t.description;
+  if(stopQueue[idx]){
+    // Decelerate
+    reelSpeeds[idx]*=0.88;
+    if(reelSpeeds[idx]<0.5){
+      // Snap to nearest slot
+      snapReel(idx);
+      return;
+    }
+  }
 
-  const strengthsEl = document.getElementById('res-strengths');
-  strengthsEl.innerHTML = t.strengths.map(s => `<li>${s}</li>`).join('');
+  strip.style.transform=`translateY(${reelOffsets[idx]}px)`;
+  rafs[idx]=requestAnimationFrame(()=>animateReel(idx));
+}
 
-  // Score bars
-  const barsEl = document.getElementById('score-bars');
-  const typeOrder = ['SJ', 'EP', 'IF', 'FN', 'TJ'];
-  const barColors = { SJ: '#00B4D8', EP: '#FF6B35', IF: '#06D6A0', FN: '#FFD600', TJ: '#7B2FBE' };
-  barsEl.innerHTML = typeOrder.map(code => {
-    const pct = Math.round((scores[code] / total) * 100);
-    return `<div class="score-bar-row">
-      <div class="score-bar-label" style="color:${barColors[code]}">${code}</div>
-      <div class="score-bar-track"><div class="score-bar-fill" style="background:${barColors[code]};width:0" data-pct="${pct}"></div></div>
-      <div class="score-bar-pct">${pct}%</div>
-    </div>`;
-  }).join('');
+function snapReel(idx){
+  const strip=reelStrips[idx];
+  const totalH=SLOT_H*REEL_COUNT;
+  // Normalize offset
+  let off=reelOffsets[idx];
+  off=((off%totalH)-totalH)%totalH; // always negative
+  // Find nearest slot boundary
+  const slotIdx=Math.round(-off/SLOT_H);
+  const snapY=-(slotIdx*SLOT_H);
 
-  // Animate bars after DOM update
-  setTimeout(() => {
-    document.querySelectorAll('.score-bar-fill').forEach(bar => {
-      bar.style.width = bar.dataset.pct + '%';
-    });
-  }, 100);
+  // Animate snap
+  let cur=off;
+  const target=snapY;
+  function snapAnim(){
+    cur+=(target-cur)*0.25;
+    if(Math.abs(cur-target)<0.3){
+      cur=target;
+      strip.style.transform=`translateY(${cur}px)`;
+      reelOffsets[idx]=cur;
+      reelSpinning[idx]=false;
+      // Read letter
+      const itemIdx=((slotIdx%REEL_COUNT)+REEL_COUNT)%REEL_COUNT;
+      const pair=PAIRS[idx];
+      reelResults[idx]=pair.letters[itemIdx%2];
+      onReelStopped(idx);
+      return;
+    }
+    strip.style.transform=`translateY(${cur}px)`;
+    reelOffsets[idx]=cur;
+    requestAnimationFrame(snapAnim);
+  }
+  snapAnim();
+}
 
-  // Routine
-  const routineEl = document.getElementById('res-routine');
-  routineEl.innerHTML = t.routine.map((r, i) => `
-    <div class="routine-step">
-      <div class="step-num" style="background:${r.color}">${i + 1}</div>
-      <div class="step-text"><strong>${r.step}</strong><br>${r.desc}</div>
-    </div>
-  `).join('');
+function onReelStopped(idx){
+  stoppedCount++;
 
-  // Tips
-  const tipsEl = document.getElementById('res-tips');
-  tipsEl.innerHTML = t.tips.map(tip => `<li>${tip}</li>`).join('');
+  // Flash effect on stopped reel
+  const reel=document.getElementById('reel'+idx);
+  reel.style.transition='background .15s';
+  reel.style.background='rgba(255,224,51,.12)';
+  setTimeout(()=>{reel.style.background='';},300);
 
-  // Other types
-  const otherEl = document.getElementById('other-types');
-  otherEl.innerHTML = Object.entries(teacherTypes)
-    .filter(([code]) => code !== typeCode)
-    .map(([code, info]) => `
-      <div class="other-type-chip" onclick="showOtherType('${code}')">
-        <span class="chip-emoji">${info.emoji}</span>
-        <div class="chip-code">${code}</div>
-        <div class="chip-name">${info.name.replace('The ', '')}</div>
+  // Sound-ish: activate next stop button
+  if(idx<3) activateStop(idx+1);
+
+  const labels=['E/I 결정!','S/N 결정!','T/F 결정!','J/P 결정! 🎉'];
+  document.getElementById('statusBar').textContent=`✅ ${labels[idx]}`;
+
+  if(stoppedCount===4){
+    setTimeout(showResult,600);
+  }
+}
+
+/* ══ RESULT ══ */
+function showResult(){
+  const mbti=reelResults.join('');
+  const data=MBTI_DATA[mbti]||{icon:'🐱',name:'특별형',activity:mbti+' 활동',quote:'"나만의 스타일!"',desc:'특별한 나만의 MBTI 수업 활동!'};
+  const link=ACTIVITY_LINKS[mbti]||'#';
+
+  phase='done';
+  document.getElementById('statusBar').className='status-bar done';
+  document.getElementById('statusBar').textContent=`🎊 ${mbti} — ${data.name}!`;
+
+  // Build chips
+  const chipColors=[
+    {bg:'rgba(255,128,112,.2)',color:'#FF8070'},
+    {bg:'rgba(255,224,51,.2)', color:'#C8A000'},
+    {bg:'rgba(112,180,255,.2)',color:'#4090E0'},
+    {bg:'rgba(112,232,168,.2)',color:'#0F9050'},
+  ];
+  const chipsHtml=reelResults.map((l,i)=>
+    `<div class="result-chip" style="background:${chipColors[i].bg};color:${chipColors[i].color};border-color:${chipColors[i].color}40">${l}</div>`
+  ).join('');
+
+  document.getElementById('resultWrap').innerHTML=`
+    <div class="result-card">
+      <div class="result-top">
+        <div class="result-mbti">${mbti}</div>
+        <div class="result-type-name">${data.name} · ${data.icon}</div>
+        <div class="result-chips">${chipsHtml}</div>
       </div>
-    `).join('');
+      <div class="result-body">
+        <div class="result-icon">${data.icon}</div>
+        <div class="result-activity">${data.activity}</div>
+        <div class="result-quote">${data.quote}</div>
+        <div class="result-desc">${data.desc}</div>
+        <div class="result-actions">
+          <a class="btn-action btn-primary" href="${link}" target="_blank">
+            <span class="btn-action-icon">🎴</span>
+            활동 카드 보러가기
+          </a>
+
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('resultWrap').style.display='block';
+  document.getElementById('againWrap').style.display='block';
+  startConfetti();
 }
 
-function showOtherType(code) {
-  renderResult(code);
-  window.scrollTo(0, 0);
+function copyResult(mbti,activity){
+  const txt=`나의 BeatCat MBTI 수업 활동:\n${mbti} — ${activity}\n🐱 BeatCat MBTI Slot`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=event.target.closest('.btn-action');
+    const orig=btn.innerHTML;
+    btn.innerHTML='<span class="btn-action-icon">✅</span> 복사됐어요!';
+    setTimeout(()=>btn.innerHTML=orig,2000);
+  }).catch(()=>{});
 }
 
-function resetQuiz() {
-  current = 0;
-  answers = {};
-  scores = { SJ: 0, EP: 0, IF: 0, FN: 0, TJ: 0 };
-  showScreen('welcome');
+function shareResult(mbti,activity){
+  if(navigator.share){
+    navigator.share({title:'BeatCat MBTI 슬롯',text:`나의 수업 유형: ${mbti} — ${activity}`,url:window.location.href});
+  } else {
+    copyResult(mbti,activity);
+  }
 }
+
+/* ══ RESET ══ */
+function resetAll(){
+  phase='idle';stoppedCount=0;
+  for(let i=0;i<4;i++){
+    reelSpinning[i]=false;
+    stopQueue[i]=false;
+    if(rafs[i])cancelAnimationFrame(rafs[i]);
+    document.getElementById('stop'+i).className='btn-stop';
+    document.getElementById('reel'+i).style.background='';
+  }
+  document.getElementById('btnSpin').disabled=false;
+  document.getElementById('statusBar').className='status-bar';
+  document.getElementById('statusBar').textContent='🐱 START를 눌러 슬롯을 돌려보세요!';
+  document.getElementById('resultWrap').style.display='none';
+  document.getElementById('againWrap').style.display='none';
+  stopConfetti();
+}
+
+/* ══ CONFETTI ══ */
+const cv=document.getElementById('cvcv');
+const cx=cv.getContext('2d');
+let pieces=[],cfRAF=null;
+function startConfetti(){
+  cv.width=innerWidth;cv.height=innerHeight;
+  pieces=[];
+  const cols=['#E8302A','#FFE033','#4090E0','#16A34A','#FF6B5A','#FFD700','#A855F7'];
+  for(let i=0;i<100;i++) pieces.push({
+    x:Math.random()*cv.width,y:-20-Math.random()*200,
+    w:7+Math.random()*7,h:5+Math.random()*5,
+    color:cols[i%cols.length],rot:Math.random()*360,
+    vx:(Math.random()-.5)*5,vy:3+Math.random()*5,vr:(Math.random()-.5)*10,
+  });
+  if(cfRAF)cancelAnimationFrame(cfRAF);animCF();
+  setTimeout(stopConfetti,4000);
+}
+function animCF(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  pieces.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+    if(p.y>cv.height+20)p.y=-20;
+    cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot*Math.PI/180);
+    cx.fillStyle=p.color;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();
+  });
+  cfRAF=requestAnimationFrame(animCF);
+}
+function stopConfetti(){
+  if(cfRAF)cancelAnimationFrame(cfRAF);cx.clearRect(0,0,cv.width,cv.height);
+}
+
+/* ══ INIT ══ */
+for(let i=0;i<4;i++) buildReel(i);
+document.getElementById('btnSpin').addEventListener('click',startAllReels);
 </script>
 </body>
 </html>
